@@ -2,13 +2,42 @@
 # Implementacja funkcji do lab2
 
 def is_valid_email(email: str) -> bool:
-    """Sprawdza podstawowy format email: musi zawierac '@' oraz kropke po @."""
+    """Sprawdza podstawowy format email:
+    - email musi byc stringiem,
+    - musi zawierac jednego '@',
+    - lokal-part (przed @) nie moze byc pusty,
+    - domena (po @) nie moze byc pusta,
+    - domena musi zawierac co najmniej jedna kropke,
+    - domena nie moze zaczynac sie ani konczyc kropka,
+    - zaden fragment domeny (między kropkami) nie moze byc pusty.
+    """
     if not isinstance(email, str):
         return False
     if "@" not in email:
         return False
-    local, domain = email.split("@", 1)
-    return "." in domain and len(local) > 0 and len(domain) > 0
+
+    # rozdzielamy na lokalna i domena tylko po pierwszym '@'
+    parts = email.split("@")
+    if len(parts) != 2:
+        return False  # wiecej niz jedno @ -> odrzucamy
+    local, domain = parts
+    if not local:
+        return False
+    if not domain:
+        return False
+
+    # domena musi zawierac kropke i nie moze zaczynac/konczyc sie kropka
+    if "." not in domain:
+        return False
+    if domain.startswith(".") or domain.endswith("."):
+        return False
+
+    # kazdy fragment domeny oddzielony kropka nie moze byc pusty
+    labels = domain.split(".")
+    if any(label == "" for label in labels):
+        return False
+
+    return True
 
 def calculate_circle_area(radius: float) -> float:
     """Oblicza pole kola: pi * r^2. Rzuca ValueError gdy radius < 0."""
@@ -52,3 +81,5 @@ def is_palindrome(text: str) -> bool:
         return False
     s = "".join(ch.lower() for ch in text if ch.isalnum())
     return s == s[::-1]
+
+
